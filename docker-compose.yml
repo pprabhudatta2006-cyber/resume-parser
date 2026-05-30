@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:15-alphine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=resume_parser_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    expose:
+      - 5432
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/resume_parser_db
+      - DEBUG=1
+      - SECRET_KEY=django-insecure-development-key
+      - JWT_SECRET_KEY=jwt-secret-key-change-it
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
